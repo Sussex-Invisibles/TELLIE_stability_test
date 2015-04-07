@@ -37,8 +37,8 @@ if __name__ == "__main__":
             # Read data
             x,y = calc.readPickleChannel(fileName, 1)
         
-            # Calculate and print parameters        
+            # Calculate and print parameters / plot        
             calc.printParams(x, y, fileName)
-            calc.plot_eg_pulses(x, y, 10, fname = "" % ())
+            calc.plot_eg_pulses(x, y, 10, show=True)
             pulse_count += len(y[:,0])
         print "Reading %d pulses from %i files in %s, took %1.2f s" % ( pulse_count, len(file_names), basePath, time.time()-pathRead )
