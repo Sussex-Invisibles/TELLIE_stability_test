@@ -1,4 +1,4 @@
-# TELLIE_stability test.a
+# TELLIE_stability_test
 Code to monitor the stability of TELLIE channels using the Tektronix DPO3000 'scope available
 underground at SNOLAB. 
 
