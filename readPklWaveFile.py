@@ -13,6 +13,14 @@ import calc_utils as calc
 import time
 import sys
 
+def find_data_filepaths(data_dir, basename):
+    """Check the number of data files in a directory"""
+    file_names = []
+    for i in range(100):
+        if os.path.isfile("%s/%s%i.pkl" % (data_dir, basename, i)):
+            file_names.append("%s/%s%i.pkl" % (data_dir, basename, i))
+    return file_names
+
 if __name__ == "__main__":
 
     ## File path
@@ -23,7 +31,7 @@ if __name__ == "__main__":
         pulse_count = 0
         pathRead = time.time()
         basePath = "./results/channel_%i" % ent
-        file_names = calc.find_data_filepaths(basePath, "run_")
+        file_names = find_data_filepaths(basePath, "run_")
 
         for fileName in file_names:
             # Read data
