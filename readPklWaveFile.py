@@ -40,6 +40,6 @@ if __name__ == "__main__":
         
             # Calculate and print parameters / plot        
             calc.printParams(x, y, fileName)
-            calc.plot_eg_pulses(x, y, 10, show=True)
+            calc.plot_eg_pulses(x, y, 10, fname="test")
             pulse_count += len(y[:,0])
         print "Reading %d pulses from %i files in %s, took %1.2f s" % ( pulse_count, len(file_names), basePath, time.time()-pathRead )
