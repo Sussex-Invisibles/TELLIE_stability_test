@@ -12,6 +12,7 @@
 import calc_utils as calc
 import time
 import sys
+import os
 
 def find_data_filepaths(data_dir, basename):
     """Check the number of data files in a directory"""
