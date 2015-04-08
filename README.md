@@ -19,4 +19,4 @@ Scipt to set up master mode running of TELLIE for a specific channel. The light 
 Opens up picked wave files and calls a few functions from AcquireTek/calc_utils.py to output the results of some standard measurements to screen.
 
 ### rootPlots.py
-Creates histograms of parameters measured on pickled data set. Results are saved in both root file format and .pdfs for quick reference. 
+Creates histograms of parameters measured on pickled data set using function from AcquireTek/root_utils.py. Results are saved in both root file format and .pdfs for quick reference. 

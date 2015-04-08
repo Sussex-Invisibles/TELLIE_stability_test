@@ -29,17 +29,15 @@ if __name__=="__main__":
     channel = int(sys.argv[2])
     IPW = int(sys.argv[3])
     delay = float(sys.argv[4]) #delay between pulses (1/rate) [ms]
-    #print fname
 
     # TELLIE settings
+    sc = serial_command.SerialCommand("/dev/tty.usbserial-FTE3C0PG")
+    ########################################################
     height = 16383
     fibre_delay = 0
     trigger_delay = 700 #As used in ftb data taking
-    #pulse_number = 10000 * 50. # 50 is scaling for data rate - we only record ~ 1/50 @ delay=1ms
-    pulse_number = 60000
-
-    # Set up serial connection
-    sc = serial_command.SerialCommand("/dev/tty.usbserial-FTE3C0PG")
+    pulse_number = 60000 #Just below max allowed by chip
+    ########################################################
     sc.select_channel(channel)
     sc.set_pulse_width(IPW)
     sc.set_pulse_height(height)
@@ -51,27 +49,41 @@ if __name__=="__main__":
     # Set-up scope
     usb_conn = scope_connections.VisaUSB()
     tek_scope = scopes.Tektronix3000(usb_conn)
+    ###########################################
+    scope_chan = 1 # We're using channel 1!
+    termination = 50 # Ohms
+    trigger = -0.5 # Volts
+    y_div_units = 1 # volts
+    x_div_units = 4e-9 # seconds
+    y_offset = -2.5*y_div_units # offset in y (2.5 divisions up)
+    x_offset = +2*x_div_units # offset in x (2 divisions to the left)
+    record_length = 1e3 # trace is 1e3 samples long
+    half_length = record_length / 2 # For selecting region about trigger point
+    ###########################################
     tek_scope.unlock()
+    tek_scope.set_horizontal_scale(x_div_units)
+    tek_scope.set_horizontal_delay(x_offset) #shift to the left 2 units
+    tek_scope.set_channel_y(scope_chan, y_div_units)
+    tek_scope.set_display_y(scope_chan, y_div_units, offset=y_offset)
+    tek_scope.set_channel_termination(scope_chan, termination)
+    tek_scope.set_edge_trigger(trigger, scope_chan, falling=True) # Falling edge trigger 
     tek_scope.set_single_acquisition() # Single signal acquisition mode
-    trigger = -0.2 # Volts
-    tek_scope.set_edge_trigger(trigger, 1, False) # Rising edge trigger 
-    time.sleep(0.1)
-    #tek_scope.set_data_mode(4899, 5049)
-    tek_scope.set_data_mode(49949, 50049)
-    time.sleep(0.1)
-    tek_scope.lock() # Re acquires the preamble  
+    tek_scope.set_record_length(record_length)
+    tek_scope.set_data_mode(half_length-50, half_length+50)
+    tek_scope.lock()
+    tek_scope.begin() # Acquires the pre-amble!
 
     # Set-up results file
     results = utils.PickleFile(fname, 1)
-    results.set_meta_data("timeform_1", tek_scope.get_timeform(1))
-    results.set_meta_data("tellie_channel", channel)
-    results.set_meta_data("width", IPW)
-    results.set_meta_data("rate", 1/(delay*1e-3))
-    results.set_meta_data("total_pulses_fired", pulse_number)
-    #print tek_scope._get_preamble
-    #results.set_meta_dict(tek_scope._get_preamble(1))       
+    results.add_meta_data("timeform_1", tek_scope.get_timeform(1))
+    results.add_meta_data("tellie_channel", channel)
+    results.add_meta_data("width", IPW)
+    results.add_meta_data("rate", 1/(delay*1e-3))
+    results.add_meta_data("total_pulses_fired", pulse_number)
 
+    ##########################################################
     # Fire and save data
+    ##########################################################
     time.sleep(0.1)
     run_length = pulse_number*1.05 * delay*1e-3 #[s] Run for slightly longer to avoid losing data
     start = time.time()
